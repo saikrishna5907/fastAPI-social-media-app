@@ -1,0 +1,13 @@
+# Virtual environment
+venv/
+.env
+.env.* 
+*.pyc
+__pycache__/
+# VSCode
+.vscode/
+*.code-workspace
+# Logs
+logs/
+*.log
+uvicorn.log
