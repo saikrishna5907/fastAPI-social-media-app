@@ -4,9 +4,11 @@ venv/
 .env.* 
 *.pyc
 __pycache__/
+
 # VSCode
 .vscode/
 *.code-workspace
+
 # Logs
 logs/
 *.log

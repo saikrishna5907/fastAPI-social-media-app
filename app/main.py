@@ -1,10 +1,12 @@
 import logging
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from .database import Base, engine
 from .routers import auth_router, post_router, user_router
 
+load_dotenv()
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 

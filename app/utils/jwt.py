@@ -1,24 +1,19 @@
-import os
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
 import jwt
-from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from ..config import settings
 from ..database import get_db
 from ..entities.user_entity import User
 from ..schemas.token_schema import TokenData
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-load_dotenv()
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
-JWT_SECRET_KEY_EXPIRE_MINUTES = int(os.getenv("JWT_SECRET_KEY_EXPIRE_MINUTES"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_password_hash(password):
@@ -27,18 +22,17 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-
-def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, None] = JWT_SECRET_KEY_EXPIRE_MINUTES):
+def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, None] = settings.JWT_SECRET_KEY_EXPIRE_MINUTES):
     to_encode = token_data.model_dump()
     expire = datetime.now(timezone.utc) + timedelta(minutes=expires_delta)
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
 
 def verify_access_token(token:str, credentials_exception):
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get("email")
         id: str = payload.get("id")
         if id is None or email is None:
