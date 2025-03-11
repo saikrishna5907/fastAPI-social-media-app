@@ -19,3 +19,12 @@ class PostDto(PostDtoBase, CreateAtBaseModel):
     id: int
     user_id: int
     user: UserDto
+    class Config:
+        from_attributes = True
+    
+
+class PostDtoWithVotes(BaseModel):
+    post: PostDto
+    votes: int
+    class Config:
+        from_attributes = True

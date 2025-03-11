@@ -17,6 +17,8 @@ class CreateUserRequestDto(BaseModel):
 class UserDtoBase(CreateAtBaseModel):
     email: EmailStr
     id: int
+    class Config:
+        from_attributes = True
 
 class UserDto(UserDtoBase):
     pass

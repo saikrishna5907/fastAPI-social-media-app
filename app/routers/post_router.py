@@ -1,13 +1,17 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from ..database import get_db
 from ..entities.post_entity import Post
 from ..entities.user_entity import User
-from ..schemas.post_schema import CreatePostRequestDto, PostDto
+from ..entities.vote_entity import Vote
+from ..schemas.post_schema import (CreatePostRequestDto, PostDto,
+                                   PostDtoWithVotes)
 from ..schemas.token_schema import TokenData
+from ..schemas.user_schema import UserDto
 from ..utils.jwt import get_current_token_payload, get_current_user
 from ..utils.utils import only_owner_action
 
@@ -30,26 +34,32 @@ def create_post(post: CreatePostRequestDto, db:Session = Depends(get_db), token_
     db.refresh(new_post)
     return new_post
 
-@router.get("", response_model=List[PostDto])
+@router.get("", response_model=List[PostDtoWithVotes])
 def get_all_posts(db:Session = Depends(get_db), token_data: TokenData = Depends(get_current_token_payload), limit: int = 10, skip: int = 0, search: Optional[str] = ''):  
     # with psycopg.connect(host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD) as conn:
     #     with conn.cursor(row_factory = dict_row) as cursor:
     #         cursor.execute("""SELECT * FROM posts""")
     #         posts = cursor.fetchall()
-    print(search)
-    posts = db.query(Post).filter(Post.title.ilike(f"%{search.strip()}%")).limit(limit).offset(skip).options(joinedload(Post.user)).all()
-    return posts
+    query = db.query(Post, func.count(Vote.post_id).label("votes")).outerjoin(Vote, Vote.post_id == Post.id).group_by(Post.id).order_by("votes").filter(Post.title.ilike(f"%{search.strip()}%")).limit(limit).offset(skip)
+    posts = query.all()
+    response = [
+        PostDtoWithVotes(post=PostDto.model_validate(post), votes=votes) for post, votes in posts
+    ]
 
-@router.get("/{id}")
+    return response
+
+@router.get("/{id}", response_model=PostDtoWithVotes)
 def get_post(id: int, db:Session = Depends(get_db), current_user:User = Depends(get_current_user)):
     # with psycopg.connect(host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD) as conn:
     #     with conn.cursor(row_factory = dict_row) as cursor:
     #         cursor.execute("""SELECT * FROM posts where id = %s""", (id,))
     #         post = cursor.fetchone()
-    post = db.query(Post).filter(Post.id == id).first()
-    if not post:
+    post_data = db.query(Post, func.count(Vote.post_id).label("votes")).outerjoin(Vote, Vote.post_id == Post.id).group_by(Post.id).order_by("votes").filter(Post.id == id).first()
+    if not post_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
-    return post
+    post, votes = post_data
+    
+    return PostDtoWithVotes(post=post, votes=votes)
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int, db:Session = Depends(get_db) , token_data: TokenData = Depends(get_current_token_payload)):

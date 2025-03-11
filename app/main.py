@@ -1,14 +1,14 @@
-import logging
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from .database import Base, engine
-from .routers import auth_router, post_router, user_router
+from .routers import auth_router, post_router, user_router, vote_router
 
 load_dotenv()
-logging.basicConfig()
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+# import logging
+# logging.basicConfig()
+# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,3 +21,4 @@ def health_check():
 app.include_router(post_router.router)
 app.include_router(user_router.router)
 app.include_router(auth_router.router)
+app.include_router(vote_router.router)
