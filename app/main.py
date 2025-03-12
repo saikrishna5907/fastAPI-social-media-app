@@ -1,8 +1,8 @@
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine
 from .routers import auth_router, post_router, user_router, vote_router
 
 load_dotenv()
@@ -10,9 +10,22 @@ load_dotenv()
 # logging.basicConfig()
 # logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
+
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/health_check")
 def health_check():
