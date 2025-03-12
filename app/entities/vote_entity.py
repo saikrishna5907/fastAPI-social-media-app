@@ -1,7 +1,6 @@
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String
 
-from ..database import Base
-from .base_entity import BaseTimeStamp
+from .base_entity import Base, BaseTimeStamp
 
 
 class Vote(Base, BaseTimeStamp):

@@ -1,6 +1,6 @@
-from sqlalchemy import (TIMESTAMP, Boolean, Column, ForeignKey, Integer,
-                        String, text)
-from sqlalchemy.orm import relationship
+from sqlalchemy import TIMESTAMP, Column, text
+
+from ..database import Base
 
 
 class BaseTimeStamp:

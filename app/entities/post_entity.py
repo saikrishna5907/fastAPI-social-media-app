@@ -1,8 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, text
 from sqlalchemy.orm import relationship
 
-from ..database import Base
-from .base_entity import BaseTimeStamp
+from .base_entity import Base, BaseTimeStamp
 
 
 class Post(Base, BaseTimeStamp):
