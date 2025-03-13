@@ -1,6 +1,3 @@
-
-from datetime import datetime
-
 from pydantic import BaseModel, EmailStr
 
 from .base_schema import CreateAtBaseModel
@@ -13,6 +10,10 @@ class UserLoginRequestDto(BaseModel):
 class CreateUserRequestDto(BaseModel):
     email: EmailStr
     password: str
+    phone: str
+    first_name: str
+    last_name: str
+    active: bool = True
 
 class UserDtoBase(CreateAtBaseModel):
     email: EmailStr
