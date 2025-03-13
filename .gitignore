@@ -13,3 +13,6 @@ __pycache__
 logs/
 *.log
 uvicorn.log
+
+# aws
+aws-social-media-ec2.pem
