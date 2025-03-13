@@ -22,7 +22,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, None] = settings.JWT_SECRET_KEY_EXPIRE_MINUTES):
+def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, None] = int(settings.JWT_SECRET_KEY_EXPIRE_MINUTES)):
     to_encode = token_data.model_dump()
     expire = datetime.now(timezone.utc) + timedelta(minutes=expires_delta)
 
