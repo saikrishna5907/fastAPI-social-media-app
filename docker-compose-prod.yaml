@@ -18,8 +18,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
       
   fastapi:
-    build: "."
-    continaer_name: social_media_fastapi
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: social-media-api
     restart: always
     depends_on:
       - db
