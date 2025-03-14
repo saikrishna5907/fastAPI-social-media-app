@@ -6,23 +6,40 @@ services:
     ports:
       - 5432:5432
     shm_size: 128mb
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env.local.docker
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
     restart: always
     ports:
       - 8888:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - .env.local.docker
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+
+  social_media_api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: social_media_api
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.local.docker
+    ports:
+      - 8000:8000   
 
 volumes:
   local_pgdata:

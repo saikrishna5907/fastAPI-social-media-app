@@ -8,36 +8,27 @@ services:
     shm_size: 128mb
     env_file:
       - .env.prod
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      # POSTGRES_PORT: ${POSTGRES_PORT}
-      # POSTGRES_HOST: ${POSTGRES_HOST}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
       
-  fastapi:
+  social_media_api:
     build: 
       context: .
       dockerfile: Dockerfile.prod
-    container_name: social-media-api
+    container_name: social_media_api
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env.prod
     ports:
       - 8000:8000
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      JWT_SECRET_KEY_EXPIRE_MINUTES: ${JWT_SECRET_KEY_EXPIRE_MINUTES}
-      JWT_ALGORITHM: ${JWT_ALGORITHM}
 
   pgadmin:
     image: dpage/pgadmin4
@@ -45,9 +36,8 @@ services:
     restart: always
     ports:
       - 8888:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - .env.prod
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
