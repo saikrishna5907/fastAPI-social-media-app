@@ -7,7 +7,7 @@ services:
       - 5432:5432
     shm_size: 128mb
     env_file:
-      - .env.local.docker
+      - .env
     volumes:
       - local_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -23,21 +23,22 @@ services:
     ports:
       - 8888:80
     env_file:
-      - .env.local.docker
+      - .env
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
   social_media_api:
     build: 
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+    image: saikrishna59/fastapi-social_media_api:latest
     container_name: social_media_api
     restart: always
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - .env.local.docker
+      - .env
     ports:
       - 8000:8000   
 
