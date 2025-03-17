@@ -1,10 +1,6 @@
-
-from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr
-
-from .base_schema import CreateAtBaseModel
+from pydantic import BaseModel
 
 
 class VoteDTO(BaseModel):

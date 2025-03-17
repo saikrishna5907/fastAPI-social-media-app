@@ -17,6 +17,9 @@ class CreateUserRequestDto(BaseModel):
 
 class UserDtoBase(CreateAtBaseModel):
     email: EmailStr
+    phone: str
+    first_name: str
+    last_name: str
     id: int
     class Config:
         from_attributes = True

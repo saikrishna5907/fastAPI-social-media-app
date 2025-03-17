@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..database import get_db
+from ..config.database import get_db
 from ..entities.post_entity import Post
 from ..entities.vote_entity import Vote
 from ..schemas.token_schema import TokenData

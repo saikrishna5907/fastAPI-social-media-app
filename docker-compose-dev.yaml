@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres
-    container_name: local_pgdb
+    container_name: dev_pgdb
     restart: always
     ports:
       - 5432:5432
@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
+      - dev_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -43,5 +43,5 @@ services:
       - pgadmin_data:/var/lib/pgadmin
 
 volumes:
-  local_pgdata:
+  dev_pgdata:
   pgadmin_data:

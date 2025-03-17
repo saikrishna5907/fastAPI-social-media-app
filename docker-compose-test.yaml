@@ -1,15 +1,15 @@
 services:
   db:
     image: postgres
-    container_name: local_pgdb
+    container_name: test_pgdb
     restart: always
     ports:
       - 5432:5432
     shm_size: 128mb
     env_file:
-      - .env
+      - .env.test
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
+      - test_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -17,9 +17,9 @@ services:
       retries: 5
 
   social_media_api:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    # build: 
+    #   context: .
+    #   dockerfile: Dockerfile
     image: saikrishna59/fastapi-social_media_api:latest
     container_name: social_media_api
     restart: always
@@ -27,7 +27,7 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - .env
+      - .env.test
     ports:
       - 8000:8000   
   
@@ -38,10 +38,10 @@ services:
     ports:
       - 8888:80
     env_file:
-      - .env
+      - .env.test
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
 volumes:
-  local_pgdata:
+  test_pgdata:
   pgadmin_data:

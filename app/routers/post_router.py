@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
-from ..database import get_db
+from ..config.database import get_db
 from ..entities.post_entity import Post
 from ..entities.user_entity import User
 from ..entities.vote_entity import Vote

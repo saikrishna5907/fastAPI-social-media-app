@@ -1,11 +1,9 @@
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import auth_router, post_router, user_router, vote_router
 
-load_dotenv()
 # import logging
 # logging.basicConfig()
 # logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)

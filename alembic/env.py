@@ -4,7 +4,7 @@ from urllib.parse import quote
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app.config import settings
+from app.config.app_settings import settings
 from app.entities.base_entity import Base
 
 # this is the Alembic Config object, which provides
@@ -13,7 +13,7 @@ config = context.config
 
 # To handle special characters in the password ex: @, #, $, etc. and replcae % with %% to handle Interpolation from Alembic
 encoded_password = quote(settings.POSTGRES_PASSWORD).replace('%', '%%')  
-DB_URL = f"postgresql+psycopg://{settings.POSTGRES_USER}:{encoded_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+DB_URL = f"postgresql+psycopg://{settings.POSTGRES_USER}:{encoded_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.get_db_name()}"
 
 config.set_main_option("sqlalchemy.url", DB_URL)
 

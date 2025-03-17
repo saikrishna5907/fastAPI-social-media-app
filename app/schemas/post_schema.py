@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from .base_schema import CreateAtBaseModel
 from .user_schema import UserDto
