@@ -2,10 +2,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Union
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+
+from app.utils.custom_exceptions import CredentialsException
 
 from ..config.app_settings import settings
 from ..config.database import get_db
@@ -30,37 +32,27 @@ def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, N
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
 
-def verify_access_token(token:str, credentials_exception):
+def verify_access_token(token:str, ):
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get("email")
         id: str = payload.get("id")
         if id is None or email is None:
-            raise credentials_exception
+            raise CredentialsException()
     except jwt.PyJWTError as e:
         print(e)
-        raise credentials_exception
+        raise CredentialsException()
 
     return TokenData(email=email, id=id)
 
 def get_current_token_payload(token:str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, 
-        detail="Could not validate credentials", 
-        headers={"WWW-Authenticate": "Bearer"})
-    
-    return  verify_access_token(token, credentials_exception)
+    return  verify_access_token(token)
 
 def get_current_user(token:str = Depends(oauth2_scheme), db:Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, 
-        detail="Could not validate credentials", 
-        headers={"WWW-Authenticate": "Bearer"})
-    
-    token:TokenData =  verify_access_token(token, credentials_exception)
+    token:TokenData =  verify_access_token(token)
     if token.id is None:
-        raise credentials_exception
+        raise CredentialsException()
     user = db.query(User).filter(User.id == token.id).first()
     if user is None:
-        raise credentials_exception
+        raise CredentialsException()
     return user

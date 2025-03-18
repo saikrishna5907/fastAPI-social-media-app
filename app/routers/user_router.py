@@ -1,6 +1,8 @@
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+
+from app.utils.custom_exceptions import NotFoundException
 
 from ..config.database import get_db
 from ..entities.user_entity import User
@@ -28,5 +30,5 @@ def get_user(id: int, db:Session = Depends(get_db)):
     user = db.query(User).filter(User.id == id).first()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No user found with id: {id}")
+        raise NotFoundException(detail=f"No user found with id: {id}")
     return user

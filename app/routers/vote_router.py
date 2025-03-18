@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+
+from app.utils.custom_exceptions import ConflictException, NotFoundException
 
 from ..config.database import get_db
 from ..entities.post_entity import Post
@@ -20,7 +22,7 @@ def vote(data: VoteDTO, db:Session = Depends(get_db), token_payload: TokenData =
     post = db.query(Post).filter(Post.id == data.post_id).first()
 
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {data.post_id} not found")
+        raise NotFoundException(detail=f"Post with id {data.post_id} not found")
 
     vote_query =  db.query(Vote).filter(Vote.post_id == data.post_id, Vote.user_id == token_payload.id)
     vote = vote_query.first()
@@ -33,9 +35,9 @@ def vote(data: VoteDTO, db:Session = Depends(get_db), token_payload: TokenData =
         if data.flag == vote.flag:
             # If the user is trying to duplicate the vote then raise an error
             if vote.flag == 1:
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=already_voted_message)
+                raise ConflictException(detail=already_voted_message)
             else:
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=already_un_voted_message)
+                raise ConflictException(detail=already_un_voted_message)
             
         # If the user is not trying to duplicate the vote then update the existing vote
         else:
