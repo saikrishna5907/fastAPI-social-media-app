@@ -74,4 +74,23 @@ jobs:
           tags: ${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:latest
           cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:buildcache
           cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:buildcache,mode=max
+          
+  cleanup:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    if: ${{ always() }}  # This ensures cleanup happens regardless of the success or failure of the previous jobs
+    steps:
+      - name: Checkout code for cleanup
+        uses: actions/checkout@v2
+
+      - name: Stop and Remove Docker Containers
+        run: |
+          echo "Stopping Docker containers..."
+          docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
+
+      - name: Clean up Docker system
+        run: |
+          echo "Pruning Docker system..."
+          docker system prune -f
+      
       
