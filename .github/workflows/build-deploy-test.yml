@@ -58,6 +58,8 @@ jobs:
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.test
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env.test
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env.test
+          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env.test
           echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env.test
           echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env.test
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.test
