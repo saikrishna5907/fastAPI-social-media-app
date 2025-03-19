@@ -22,7 +22,7 @@ def vote(data: VoteDTO, db:Session = Depends(get_db), token_payload: TokenData =
     post = db.query(Post).filter(Post.id == data.post_id).first()
 
     if not post:
-        raise NotFoundException(detail=f"Post with id {data.post_id} not found")
+        raise NotFoundException(detail=f"Post with id: {data.post_id} was not found")
 
     vote_query =  db.query(Vote).filter(Vote.post_id == data.post_id, Vote.user_id == token_payload.id)
     vote = vote_query.first()
@@ -54,4 +54,3 @@ def vote(data: VoteDTO, db:Session = Depends(get_db), token_payload: TokenData =
         return {"message": "Vote created successfully"}
         
             
-       

@@ -32,7 +32,7 @@ def create_access_token(token_data: TokenData, expires_delta: Union[timedelta, N
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
 
-def verify_access_token(token:str, ):
+def verify_access_token(token:str):
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         email: str = payload.get("email")
@@ -46,7 +46,7 @@ def verify_access_token(token:str, ):
     return TokenData(email=email, id=id)
 
 def get_current_token_payload(token:str = Depends(oauth2_scheme)):
-    return  verify_access_token(token)
+    return verify_access_token(token)
 
 def get_current_user(token:str = Depends(oauth2_scheme), db:Session = Depends(get_db)):
     token:TokenData =  verify_access_token(token)

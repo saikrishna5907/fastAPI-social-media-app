@@ -25,6 +25,7 @@ def upgrade() -> None:
                     sa.Column("user_id", sa.INTEGER(), nullable=False, primary_key=True),
                     sa.Column("post_id", sa.INTEGER(), nullable=False, primary_key=True),
                     sa.Column("flag", sa.INTEGER(), nullable=False),
+                    sa.Column("created_at", sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
                     sa.CheckConstraint("flag IN (0, 1)", name="check_flag_values")
     ),
 
