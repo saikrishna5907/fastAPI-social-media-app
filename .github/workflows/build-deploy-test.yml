@@ -51,13 +51,19 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version  # Verifies installation
-          
-      # - name: Install dependencies
-      #   run: pip install -r requirements.txt
 
-      # - name: Run tests
-      #   id: tests
-      #   run: pytest -v -s --disable-warnings -x --cov=app --cov-report  term-missing tests/
+      # Create .env.test file dynamically from GitHub Secrets
+      - name: Create .env.test file
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.test
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env.test
+          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env.test
+          echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env.test
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.test
+          echo "JWT_SECRET_KEY_EXPIRE_MINUTES=${{ secrets.JWT_SECRET_KEY_EXPIRE_MINUTES }}" >> .env.test
+          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env.test
+          echo "ENV=${{ secrets.ENV }}" >> .env.test
 
       - name: Set up Docker Compose and start services
         run: |
