@@ -7,3 +7,7 @@ venv
 # Ignore environment files
 .env
 *.env
+
+# test coverage
+htmlcov
+.coverage

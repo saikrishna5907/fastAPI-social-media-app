@@ -17,10 +17,9 @@ services:
       retries: 5
 
   social_media_api:
-    # build: 
-    #   context: .
-    #   dockerfile: Dockerfile
-    image: saikrishna59/fastapi-social_media_api:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: social_media_api
     restart: always
     depends_on:

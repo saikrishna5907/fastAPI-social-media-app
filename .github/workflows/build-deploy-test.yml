@@ -1,0 +1,76 @@
+name: Build and Deploy Code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      tests-passed: ${{ steps.tests.outcome }}
+    environment:
+      name: fastapi-social-media-testing
+    env:
+      POSTGRES_USER: ${{vars.POSTGRES_USER}}
+      POSTGRES_HOST: ${{vars.POSTGRES_HOST}}
+      POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+      POSTGRES_DB: ${{vars.POSTGRES_DB}}
+      PGADMIN_DEFAULT_EMAIL: ${{vars.PGADMIN_DEFAULT_EMAIL}}
+      PGADMIN_DEFAULT_PASSWORD: ${{secrets.PGADMIN_DEFAULT_PASSWORD}}
+      JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+      JWT_SECRET_KEY_EXPIRE_MINUTES: ${{vars.JWT_SECRET_KEY_EXPIRE_MINUTES}}
+      JWT_ALGORITHM: ${{vars.JWT_ALGORITHM}}
+      ENV: ${{vars.ENV}}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python version 3.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Update pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        id: tests
+        run: pytest -v -s --disable-warnings -x --cov=app --cov-report  term-missing tests/
+
+  build_and_push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ needs.test.outputs.tests-passed == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Set up Docker Buildx and QEMU
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          
+      - name: Build and Push Docker Image with Cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:latest
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:buildcache
+          cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:buildcache,mode=max
+      
