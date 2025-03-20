@@ -1,6 +1,6 @@
 import psycopg
 from fastapi.testclient import TestClient
-from pytest import fixture, mark
+from pytest import fixture
 from sqlalchemy.orm import Session
 
 from alembic import command

@@ -74,6 +74,7 @@ jobs:
 
       - name: Run tests inside the social_media_api container
         run: |
+          docker compose config
           # Wait for the services to be ready (if necessary)
           docker-compose -f docker-compose-test.yaml exec social_media_api pytest -v -s --disable-warnings -x --cov=app --cov-report term-missing tests/
 
