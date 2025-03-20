@@ -23,7 +23,7 @@ services:
     container_name: social_media_api
     restart: always
     depends_on:
-      db:
+      social_media_db:
         condition: service_healthy
     env_file:
       - .env.test
