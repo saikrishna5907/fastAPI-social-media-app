@@ -77,6 +77,14 @@ jobs:
           # Wait for the services to be ready (if necessary)
           docker-compose -f docker-compose-test.yaml exec social_media_api pytest -v -s --disable-warnings -x --cov=app --cov-report term-missing tests/
 
+      - name: Stop and Remove Docker Containers
+        run: |
+          echo "Stopping Docker containers..."
+          docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
+      - name: Delete .env.test file
+        run: |
+          rm .env.test
+          
   build_and_push:
     needs: test
     runs-on: ubuntu-latest
@@ -127,10 +135,6 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version  # Verifies installation
 
-      - name: Stop and Remove Docker Containers
-        run: |
-          echo "Stopping Docker containers..."
-          docker-compose down --volumes --remove-orphans
 
       - name: Clean up Docker system
         run: |
