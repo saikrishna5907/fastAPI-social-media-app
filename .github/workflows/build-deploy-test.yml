@@ -133,7 +133,7 @@ jobs:
       - name: Stop and Remove Docker Containers
         run: |
           echo "Stopping Docker containers..."
-          docker-compose -f docker-compose-test.yaml down --volumes --remove-orphans
+          docker-compose down --volumes --remove-orphans
 
       - name: Clean up Docker system
         run: |
