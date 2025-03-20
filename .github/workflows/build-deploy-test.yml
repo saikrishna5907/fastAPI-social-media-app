@@ -69,8 +69,6 @@ jobs:
 
       - name: Set up Docker Compose and start services
         run: |
-          # Set up Docker Compose and start the services defined in docker-compose-test.yaml
-          # docker-compose -f docker-compose-test.yaml --env-file .env.test up -d
           docker-compose -f docker-compose-test.yaml up -d
           docker-compose -f docker-compose-test.yaml logs
 
@@ -78,11 +76,14 @@ jobs:
         run: |
           # Wait for the services to be ready (if necessary)
           docker-compose -f docker-compose-test.yaml exec social_media_api pytest -v -s --disable-warnings -x --cov=app --cov-report term-missing tests/
+      # - name: Set tests outcome
+      #   id: tests
+      #   run: echo "::set-output name=tests-passed::${{ job.status }}"
 
   build_and_push:
     needs: test
     runs-on: ubuntu-latest
-    if: ${{ needs.test.outputs.tests-passed == 'success' }}
+    # if: ${{ needs.test.outputs.tests-passed == 'success' }}
 
     steps:
       - name: Checkout code
