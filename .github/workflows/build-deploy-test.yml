@@ -55,35 +55,27 @@ jobs:
       # Create .env.test file dynamically from GitHub Secrets
       - name: Create .env.test file
         run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.test
+          echo "POSTGRES_USER=${{ vars.POSTGRES_USER }}" >> .env.test
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env.test
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env.test
-          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env.test
-          echo "PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}" >> .env.test
+          echo "POSTGRES_DB=${{ vars.POSTGRES_DB }}" >> .env.test
+          echo "POSTGRES_HOST=${{ vars.POSTGRES_HOST }}" >> .env.test
+          echo "POSTGRES_PORT=${{ vars.POSTGRES_PORT }}" >> .env.test
+          echo "PGADMIN_DEFAULT_EMAIL=${{ vars.PGADMIN_DEFAULT_EMAIL }}" >> .env.test
           echo "PGADMIN_DEFAULT_PASSWORD=${{ secrets.PGADMIN_DEFAULT_PASSWORD }}" >> .env.test
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env.test
-          echo "JWT_SECRET_KEY_EXPIRE_MINUTES=${{ secrets.JWT_SECRET_KEY_EXPIRE_MINUTES }}" >> .env.test
-          echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env.test
-          echo "ENV=${{ secrets.ENV }}" >> .env.test
-
-          # Confirm that the file exists and print its contents
-          if [ -f .env.test ]; then
-            echo ".env.test file exists"
-            cat .env.test
-          else
-            echo ".env.test file does not exist"
-          fi
+          echo "JWT_SECRET_KEY_EXPIRE_MINUTES=${{ vars.JWT_SECRET_KEY_EXPIRE_MINUTES }}" >> .env.test
+          echo "JWT_ALGORITHM=${{ vars.JWT_ALGORITHM }}" >> .env.test
+          echo "ENV=${{ vars.ENV }}" >> .env.test
 
       - name: Set up Docker Compose and start services
         run: |
           # Set up Docker Compose and start the services defined in docker-compose-test.yaml
+          # docker-compose -f docker-compose-test.yaml --env-file .env.test up -d
           docker-compose -f docker-compose-test.yaml up -d
 
       - name: Run tests inside the social_media_api container
         run: |
           # Wait for the services to be ready (if necessary)
-          docker-compose -f docker-compose-test.yaml exec social_media_api printenv
           docker-compose -f docker-compose-test.yaml exec social_media_api pytest -v -s --disable-warnings -x --cov=app --cov-report term-missing tests/
 
   build_and_push:
