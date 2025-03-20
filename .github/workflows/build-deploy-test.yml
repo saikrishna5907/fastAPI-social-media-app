@@ -72,6 +72,7 @@ jobs:
           # Set up Docker Compose and start the services defined in docker-compose-test.yaml
           # docker-compose -f docker-compose-test.yaml --env-file .env.test up -d
           docker-compose -f docker-compose-test.yaml up -d
+          docker-compose -f docker-compose-test.yaml logs -f
 
       - name: Run tests inside the social_media_api container
         run: |

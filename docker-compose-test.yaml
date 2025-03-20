@@ -1,5 +1,5 @@
 services:
-  db:
+  social_media_db:
     image: postgres
     container_name: test_pgdb
     restart: always
