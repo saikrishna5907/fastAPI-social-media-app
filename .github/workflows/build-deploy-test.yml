@@ -67,6 +67,14 @@ jobs:
           echo "JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }}" >> .env.test
           echo "ENV=${{ secrets.ENV }}" >> .env.test
 
+          # Confirm that the file exists and print its contents
+          if [ -f .env.test ]; then
+            echo ".env.test file exists"
+            cat .env.test
+          else
+            echo ".env.test file does not exist"
+          fi
+
       - name: Set up Docker Compose and start services
         run: |
           # Set up Docker Compose and start the services defined in docker-compose-test.yaml
