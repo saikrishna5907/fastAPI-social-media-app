@@ -8,37 +8,7 @@ on:
     branches:
       - master
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      # Set up Docker and Docker Compose
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-        with:
-          version: latest
-
-      - name: Install Docker Compose
-        run: |
-          # Remove old Docker Compose version if exists (cleanup)
-          sudo rm -f /usr/local/bin/docker-compose
-
-          # Install the latest stable version of Docker Compose
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-          # Make Docker Compose executable
-          sudo chmod +x /usr/local/bin/docker-compose
-
-          # Verify Docker Compose version
-          docker-compose --version
-
-          # Ensure that Docker Compose is in the PATH
-          echo "/usr/local/bin" >> $GITHUB_PATH
   test:
-    needs: setup
     runs-on: ubuntu-latest
     outputs:
       tests-passed: ${{ steps.tests.outcome }}
@@ -58,6 +28,9 @@ jobs:
       ENV: ${{vars.ENV}}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up Python version 3.12
         uses: actions/setup-python@v2
         with:
@@ -65,6 +38,19 @@ jobs:
 
       - name: Update pip
         run: python -m pip install --upgrade pip
+
+      # Set up Docker (using Docker Buildx)
+      - name: Set up Docker Buildx and QEMU
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version  # Verifies installation
 
       # Create .env.test file dynamically from GitHub Secrets
       - name: Create .env.test file
@@ -93,7 +79,7 @@ jobs:
           docker-compose -f docker-compose-test.yaml exec social_media_api pytest -v -s --disable-warnings -x --cov=app --cov-report term-missing tests/
 
   build_and_push:
-    needs: [test, setup]
+    needs: test
     runs-on: ubuntu-latest
     if: ${{ needs.test.outputs.tests-passed == 'success' }}
 
@@ -107,6 +93,11 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
+      - name: Set up Docker Buildx and QEMU
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          
       - name: Build and Push Docker Image with Cache
         uses: docker/build-push-action@v6
         with:
@@ -117,10 +108,26 @@ jobs:
           cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/fastapi-social_media_api:buildcache,mode=max
           
   cleanup:
-    needs: [build_and_push, setup]
+    needs: build_and_push
     runs-on: ubuntu-latest
     if: ${{ always() }}  # This ensures cleanup happens regardless of the success or failure of the previous jobs
     steps:
+      - name: Checkout code for cleanup
+        uses: actions/checkout@v2
+
+      # Set up Docker (using Docker Buildx)
+      - name: Set up Docker Buildx and QEMU
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version  # Verifies installation
+
       - name: Stop and Remove Docker Containers
         run: |
           echo "Stopping Docker containers..."
