@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, text
 from sqlalchemy.orm import relationship
 
-from .base_entity import Base, BaseTimeStamp
+from app.entities.base_entity import Base, BaseTimeStamp
 
 
 class Post(Base, BaseTimeStamp):
@@ -11,6 +11,5 @@ class Post(Base, BaseTimeStamp):
     content = Column(String, nullable=False)
     published = Column(Boolean, default=True, server_default=text("true"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-
     user = relationship("User")
     

@@ -3,7 +3,7 @@ from urllib.parse import quote
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from .app_settings import settings
+from app.config.app_settings import settings
 
 encoded_password = quote(settings.POSTGRES_PASSWORD) # URL encode the password to handle special characters in the password ex: @, #, $, etc.
 

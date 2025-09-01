@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.config.database import get_db
+from app.entities.post_entity import Post
+from app.entities.vote_entity import Vote
+from app.schemas.token_schema import TokenData
+from app.schemas.vote_schema import VoteDTO
 from app.utils.custom_exceptions import ConflictException, NotFoundException
-
-from ..config.database import get_db
-from ..entities.post_entity import Post
-from ..entities.vote_entity import Vote
-from ..schemas.token_schema import TokenData
-from ..schemas.vote_schema import VoteDTO
-from ..utils.jwt import get_current_token_payload
+from app.utils.jwt import get_current_token_payload
 
 router = APIRouter(
     prefix="/vote",

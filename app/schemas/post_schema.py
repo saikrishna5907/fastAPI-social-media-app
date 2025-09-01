@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from .base_schema import CreateAtBaseModel
-from .user_schema import UserDto
+from app.schemas.base_schema import CreateAtBaseModel
+from app.schemas.user_schema import UserDto
 
 
 class PostDtoBase(BaseModel):

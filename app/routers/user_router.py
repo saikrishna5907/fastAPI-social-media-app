@@ -2,12 +2,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.config.database import get_db
+from app.entities.user_entity import User
+from app.schemas.user_schema import CreateUserRequestDto, UserDto
 from app.utils.custom_exceptions import NotFoundException
-
-from ..config.database import get_db
-from ..entities.user_entity import User
-from ..schemas.user_schema import CreateUserRequestDto, UserDto
-from ..utils.jwt import get_password_hash
+from app.utils.jwt import get_password_hash
 
 router = APIRouter(
     prefix="/users",

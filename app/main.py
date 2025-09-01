@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import auth_router, post_router, user_router, vote_router
+from app.routers import auth_router, post_router, user_router, vote_router
 
 # import logging
 # logging.basicConfig()

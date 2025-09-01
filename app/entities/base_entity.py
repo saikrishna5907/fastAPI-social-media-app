@@ -1,6 +1,6 @@
 from sqlalchemy import TIMESTAMP, Column, text
 
-from ..config.database import Base
+from app.config.database import Base
 
 
 class BaseTimeStamp:

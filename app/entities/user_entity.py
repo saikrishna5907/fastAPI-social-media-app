@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String, text
 
-from .base_entity import Base, BaseTimeStamp
+from app.entities.base_entity import Base, BaseTimeStamp
 
 
 class User(Base, BaseTimeStamp):

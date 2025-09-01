@@ -4,17 +4,16 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.config.database import get_db
+from app.entities.post_entity import Post
+from app.entities.user_entity import User
+from app.entities.vote_entity import Vote
+from app.schemas.post_schema import (CreatePostRequestDto, PostDto,
+                                     PostDtoBase, PostDtoWithVotes)
+from app.schemas.token_schema import TokenData
 from app.utils.custom_exceptions import NotFoundException
-
-from ..config.database import get_db
-from ..entities.post_entity import Post
-from ..entities.user_entity import User
-from ..entities.vote_entity import Vote
-from ..schemas.post_schema import (CreatePostRequestDto, PostDto, PostDtoBase,
-                                   PostDtoWithVotes)
-from ..schemas.token_schema import TokenData
-from ..utils.jwt import get_current_token_payload, get_current_user
-from ..utils.utils import only_owner_action
+from app.utils.jwt import get_current_token_payload, get_current_user
+from app.utils.utils import only_owner_action
 
 router = APIRouter(
     prefix="/posts",

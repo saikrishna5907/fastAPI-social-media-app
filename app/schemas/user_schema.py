@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
-from .base_schema import CreateAtBaseModel
+from app.schemas.base_schema import CreateAtBaseModel
 
 
 class UserLoginRequestDto(BaseModel):
